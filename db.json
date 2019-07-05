@@ -1,19 +1,22 @@
 {
   "persons": [
     {
-      "id": 1,
+      "id": 1, 
       "name": "Ryan",
-      "number": "63139469"
+      "number": "63139469",
+      "visible": true
     },
     {
-      "id": 2,
+      "id": 2, 
       "name": "Lesley",
-      "number": "91633671"
+      "number": "91633671",
+      "visible": false
     },
     {
-      "id": 3,
+      "id": 3, 
       "name": "Robert",
-      "number": "263344772"
+      "number": "263344772", 
+      "visible": true
     }
   ]
 }

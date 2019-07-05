@@ -3,12 +3,7 @@ import Person from "./components/Person";
 import axios from "axios";
 
 const Phonebook = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", phone: "040-123456" },
-    { name: "Ada Lovelace", phone: "39-44-5323523" },
-    { name: "Dan Abramov", phone: "12-43-234345" },
-    { name: "Mary Poppendieck", phone: "39-23-6423122" }
-  ]);
+  const [persons, setPersons] = useState([]);
 
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
@@ -27,23 +22,24 @@ const Phonebook = () => {
 
   useEffect(() => {
     console.log('effect')
-    axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      console.log('promise fulfilled')
-      setPersons(response.data)
-    })
+    personService
+      .getAll()
+      .then(response => {
+        setPersons(response.data)
+      })
   }, [])
-  console.log('render', persons.length)
+
+
 
   const addPerson = event => {
     event.preventDefault();
     const personObject = {
       name: newName,
-      phone: newPhone
+      phone: newPhone, 
+      visible: true
     };
       axios
-      .post('http://localhost:3001/notes', noteObject)
+      .post('http://localhost:3001/persons', personObject)
       .then(response => {
         setPersons(persons.concat(response.data))
         setNewName('')
@@ -51,18 +47,44 @@ const Phonebook = () => {
       })
   };
   
+  const visible = ({ person, toggleVisibility }) => {
+    const label = person.visible
+      ? 'make not visible' : 'make visible'
+      return (
+        <li>
+          {person.name}{person.phone}
+          <button onClick={toggleVisibility}>{label} </button>
+        </li>
+      )
+  }
 
   const filterChangeHandler = event => {
     console.log(event.target.value);
     setNewFilter(event.target.value);
   };
 
+  const toggleVisibilityOf = id => {
+    // the unique url for each person based on id 
+    const url = `http://localhost:3001/persons/${id}`
+    // find the person we want to modify, and assign it a variable
+    const person = persons.find(p => p.id === id)
+    // create a new object, excluding the visibility property 
+    const changedPerson = {...person, visible: !person.visible }
+    // create new object, and put it back 
+    axios.put(url, changedPerson).then(response => {
+      // creates new array, except for the old note, but that is updated by the map method
+      setPersons(persons.map(person => person.id !== id ? person : response.data))
+    })
+  }
   const rows = () =>
     persons
       .filter(person =>
         person.name.toLowerCase().includes(newFilter.toLowerCase())
       )
-      .map(person => <Person key={person.phone} person={person} />);
+      .map(person => <Person 
+      key={person.phone} 
+      person={person}
+      toggleVisibility = {() => toggleVisibilityOf(person.id)} />);
 
   const nameChangeHandler = event => {
     console.log(event.target.value);
