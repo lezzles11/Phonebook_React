@@ -1,70 +1,76 @@
 import React, { useState, useEffect } from "react";
 import Person from "./components/Person";
+import personService from './services/notes'
 import axios from "axios";
 
 const Phonebook = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", phone: "040-123456" },
-    { name: "Ada Lovelace", phone: "39-44-5323523" },
-    { name: "Dan Abramov", phone: "12-43-234345" },
-    { name: "Mary Poppendieck", phone: "39-23-6423122" }
-  ]);
-
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
-  {
-    /* const [persons, setPersons] = useState([]); */
-  }
   const [showAll, setShowAll] = useState(true);
   const [newFilter, setNewFilter] = useState("");
-  {
-    /* 
+
   const peopleToShow = showAll
     ? persons
-    : persons.filter(person => person.name === null);
-*/
-  }
+    : persons.filter(person => person.visible === false);
 
   useEffect(() => {
-    console.log('effect')
-    axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      console.log('promise fulfilled')
-      setPersons(response.data)
-    })
+    console.log('currently changing the data!')
+    personService
+      .getAll()
+      .then(response => {
+        setPersons(response.data)
+      })
   }, [])
-  console.log('render', persons.length)
+  console.log('Showing ' + (persons.length + 1) + ' number of people'); 
+  
+  const toggleVisibility = id => {
+    const person = persons.find(p => p.id === id)
+    const changedPerson = { ...person, visible: !person.visible }
+    
+    personService
+      .update(id, changedPerson)
+      .then(response => {
+        setPersons(persons.map(person => person.id !== id ? person : response.data))
+    })
+    .catch(error => {
+      alert(`${person.name} was already invisible`)
+      setPersons(persons.filter(p => p.id !== id))
+    }) 
+  }
 
   const addPerson = event => {
     event.preventDefault();
     const personObject = {
       name: newName,
       phone: newPhone,
-      id: newPhone
+      visible: true
     };
-    if (persons.findIndex(person => person.name === newName) > -1) {
-      console.log("Person already exists");
-      alert(`${newName} is already added to phonebook`);
-    } else {
-      setPersons(persons.concat(personObject));
+    personService 
+      .create(personObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+        setNewName('')
+        setNewPhone('') 
+      })
     }
-    setNewName("");
-    setNewPhone("");
-  };
-  
-
+    
   const filterChangeHandler = event => {
     console.log(event.target.value);
     setNewFilter(event.target.value);
   };
 
+  
   const rows = () =>
-    persons
+  peopleToShow
       .filter(person =>
         person.name.toLowerCase().includes(newFilter.toLowerCase())
       )
-      .map(person => <Person key={person.phone} person={person} />);
+      .map(person => <Person 
+      key={person.id} 
+      person={person} 
+      toggleImportance={() => toggleVisibility(person.visible)}
+      />);
 
   const nameChangeHandler = event => {
     console.log(event.target.value);
@@ -79,7 +85,7 @@ const Phonebook = () => {
     <div>
       <input value={newFilter} onChange={filterChangeHandler} />
       <button onClick={() => setShowAll(!showAll)}>
-        show {showAll ? "important" : "all"}
+        show {showAll ? "deleted" : "all"}
       </button>
       <h1> Phonebook </h1>
       <h1> Add New Contact </h1>
