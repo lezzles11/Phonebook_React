@@ -24,6 +24,8 @@
     "eject": "react-scripts eject",
     "server": "json-server -p3001 db.json"
   },
+  "author": "Lesley",
+  "license": "MIT",
   "browserslist": [
     ">0.2%",
     "not dead",

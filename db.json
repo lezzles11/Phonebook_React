@@ -4,13 +4,13 @@
       "id": 1,
       "content": "HTML is easy",
       "date": "2019-05-30T17:30:31.098Z",
-      "important": true
+      "important": false
     },
     {
       "id": 2,
       "content": "Browser can execute only Javascript",
       "date": "2019-05-30T18:39:34.091Z",
-      "important": false
+      "important": true
     },
     {
       "id": 3,
@@ -87,8 +87,14 @@
     {
       "content": "a new noteasdfasdf",
       "date": "2019-07-08T08:40:22.875Z",
-      "important": true,
+      "important": false,
       "id": 15
+    },
+    {
+      "content": "asdfa",
+      "date": "2019-07-08T08:48:02.455Z",
+      "important": false,
+      "id": 16
     }
   ]
 }
