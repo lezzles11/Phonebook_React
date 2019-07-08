@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Person from "./components/Person";
-import personService from './services/notes'
+import personService from "./services/notes";
 import axios from "axios";
 
 const Phonebook = () => {
@@ -15,29 +15,29 @@ const Phonebook = () => {
     : persons.filter(person => person.visible === false);
 
   useEffect(() => {
-    console.log('currently changing the data!')
-    personService
-      .getAll()
-      .then(response => {
-        setPersons(response.data)
-      })
-  }, [])
-  console.log('Showing ' + (persons.length + 1) + ' number of people'); 
-  
+    console.log("currently changing the data!");
+    personService.getAll().then(response => {
+      setPersons(response.data);
+    });
+  }, []);
+  console.log("Showing " + (persons.length + 1) + " number of people");
+
   const toggleVisibility = id => {
-    const person = persons.find(p => p.id === id)
-    const changedPerson = { ...person, visible: !person.visible }
-    
+    const person = persons.find(p => p.id === id);
+    const changedPerson = { ...person, visible: !person.visible };
+
     personService
       .update(id, changedPerson)
       .then(response => {
-        setPersons(persons.map(person => person.id !== id ? person : response.data))
-    })
-    .catch(error => {
-      alert(`${person.name} was already invisible`)
-      setPersons(persons.filter(p => p.id !== id))
-    }) 
-  }
+        setPersons(
+          persons.map(person => (person.id !== id ? person : response.data))
+        );
+      })
+      .catch(error => {
+        alert(`${person.name} was already invisible`);
+        setPersons(persons.filter(p => p.id !== id));
+      });
+  };
 
   const addPerson = event => {
     event.preventDefault();
@@ -46,31 +46,30 @@ const Phonebook = () => {
       phone: newPhone,
       visible: true
     };
-    personService 
-      .create(personObject)
-      .then(response => {
-        setPersons(persons.concat(response.data))
-        setNewName('')
-        setNewPhone('') 
-      })
-    }
-    
+    personService.create(personObject).then(response => {
+      setPersons(persons.concat(response.data));
+      setNewName("");
+      setNewPhone("");
+    });
+  };
+
   const filterChangeHandler = event => {
     console.log(event.target.value);
     setNewFilter(event.target.value);
   };
 
-  
   const rows = () =>
-  peopleToShow
+    peopleToShow
       .filter(person =>
         person.name.toLowerCase().includes(newFilter.toLowerCase())
       )
-      .map(person => <Person 
-      key={person.id} 
-      person={person} 
-      toggleImportance={() => toggleVisibility(person.visible)}
-      />);
+      .map(person => (
+        <Person
+          key={person.id}
+          person={person}
+          toggleImportance={() => toggleVisibility(person.visible)}
+        />
+      ));
 
   const nameChangeHandler = event => {
     console.log(event.target.value);
